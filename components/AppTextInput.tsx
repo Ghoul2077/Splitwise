@@ -33,6 +33,8 @@ const AppTextInput = forwardRef<TextInput, AppTextInputPropsWithFocusedProps>(
       style,
       fontStyle,
       focusedProps,
+      onFocus,
+      onBlur,
       ...others
     },
     ref
@@ -60,8 +62,14 @@ const AppTextInput = forwardRef<TextInput, AppTextInputPropsWithFocusedProps>(
         {isFocused && !!FocusedLeftIcon ? FocusedLeftIcon : LeftIcon}
         <TextInput
           ref={ref}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={(props) => {
+            setIsFocused(true);
+            if (onFocus) onFocus(props);
+          }}
+          onBlur={(props) => {
+            setIsFocused(false);
+            if (onBlur) onBlur(props);
+          }}
           style={[
             styles.input,
             { color: colors.text },

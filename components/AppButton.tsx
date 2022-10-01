@@ -26,6 +26,7 @@ export interface AppButtonProps extends Omit<TouchableOpacityProps, "onPress"> {
   rightIconSize?: number;
   iconSize?: number;
   iconColor?: string;
+  containerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   ripple?: boolean | (PressableAndroidRippleConfig & { overflow?: boolean });
   onPress?: Function;
@@ -48,6 +49,7 @@ const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
       iconSize = 30,
       iconColor = "white",
       style,
+      containerStyle,
       ripple,
       onPress,
       numberOfLines,
@@ -71,6 +73,7 @@ const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
         {...(!isRippleOverflowAllowed
           ? {
               style: [
+                containerStyle,
                 styles.overflowWrapper,
                 {
                   borderRadius: flattenedStyle?.borderRadius ?? 10,

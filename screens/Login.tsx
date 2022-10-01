@@ -1,13 +1,25 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useRef } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
+import * as Yup from "yup";
 import AppButton from "../components/AppButton";
 import AppText from "../components/AppText";
-import AppTextInput from "../components/AppTextInput";
+import {
+  AppForm,
+  AppFormField,
+  AppFormErrorMessage,
+  SubmitButton,
+} from "../components/Form";
 import Screen from "../components/Screen";
 import useThemeColors from "../hooks/useThemeColors";
 
+const validationSchema = Yup.object().shape({
+  email: Yup.string().email().required().label("Email"),
+  password: Yup.string().required().label("Password"),
+});
+
 const LoginScreen = () => {
   const colors = useThemeColors();
+  const passwordInputRef = useRef<TextInput>(null);
 
   return (
     <Screen
@@ -15,42 +27,51 @@ const LoginScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <AppText style={styles.title}>Welcome back to Splitwise!</AppText>
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <AppText style={styles.label}>Email address</AppText>
-          <AppTextInput
-            focusedProps={{
-              style: [styles.input, { borderBottomColor: colors.primary }],
-            }}
-            style={[styles.input, { borderBottomColor: colors.white }]}
-            fontStyle={styles.inputTxt}
+      <AppForm
+        initialValues={{ email: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={(values) => console.log(values)}
+      >
+        <AppFormErrorMessage />
+        <View style={styles.form}>
+          <AppFormField
+            autoFocus
+            style={styles.inputGroup}
+            onSubmitEditing={() => passwordInputRef.current?.focus()}
+            blurOnSubmit={false}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            returnKeyType="next"
+            label="Email address"
+            name="email"
+          />
+          <AppFormField
+            ref={passwordInputRef}
+            textContentType="password"
+            autoComplete="password"
+            autoCorrect={false}
+            secureTextEntry={true}
+            style={styles.inputGroup}
+            name="password"
           />
         </View>
-        <View>
-          <AppText style={styles.label}>Password</AppText>
-          <AppTextInput
-            focusedProps={{
-              style: [styles.input, { borderBottomColor: colors.primary }],
-            }}
-            style={[styles.input, { borderBottomColor: colors.white }]}
-            fontStyle={styles.inputTxt}
+        <View style={styles.btnContainer}>
+          <SubmitButton
+            ripple
+            title="Log in"
+            style={styles.loginBtn}
+            textStyle={styles.loginBtnText}
+          />
+          <AppButton
+            ripple
+            textStyle={[styles.forgotPassBtnTxt, { color: colors.secondary }]}
+            style={styles.forgotPassBtn}
+            title="Forgot your password?"
           />
         </View>
-      </View>
-      <View style={styles.btnContainer}>
-        <AppButton
-          ripple
-          style={styles.loginBtn}
-          textStyle={styles.loginBtnText}
-          title="Log in"
-        />
-        <AppButton
-          ripple
-          textStyle={[styles.forgotPassBtnTxt, { color: colors.secondary }]}
-          style={styles.forgotPassBtn}
-          title="Forgot your password?"
-        />
-      </View>
+      </AppForm>
     </Screen>
   );
 };

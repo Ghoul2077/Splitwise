@@ -15,7 +15,7 @@
     "@react-navigation/native-stack": "^6.9.0",
     "@reduxjs/toolkit": "^1.8.5",
     "expo": "~46.0.9",
-    "expo-font": "~10.2.0",
+    "expo-font": "~10.2.1",
     "expo-haptics": "~11.3.0",
     "expo-linking": "~3.2.2",
     "expo-navigation-bar": "~1.3.0",
