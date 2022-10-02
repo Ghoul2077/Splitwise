@@ -16,6 +16,7 @@ import OnboardingScreen from "../screens/Onboarding";
 import routes from "./routes";
 import LoginScreen from "../screens/Login";
 import { StyleSheet } from "react-native";
+import SignupScreen from "../screens/Signup";
 
 // This is the main stack where you would wrap up all other stack and serve to
 // your app
@@ -69,6 +70,11 @@ export default function Navigator() {
         <MainStackNavigator.Screen
           name={routes.LOGIN_SCREEN}
           component={LoginScreen}
+        />
+        <MainStackNavigator.Screen
+          options={{ headerShown: false }}
+          name={routes.SIGNUP_SCREEN}
+          component={SignupScreen}
         />
         <MainStackNavigator.Screen name="Tabs" component={TabStack} />
       </MainStackNavigator.Navigator>

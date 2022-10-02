@@ -5,6 +5,7 @@ enum routes {
   ACCOUNT_SCREEN = "Account",
   ONBOARDING_SCREEN = "Onboarding",
   LOGIN_SCREEN = "Login",
+  SIGNUP_SCREEN = "Signup",
 }
 
 export default routes;

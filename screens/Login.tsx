@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import * as Yup from "yup";
 import AppButton from "../components/AppButton";
 import AppText from "../components/AppText";
@@ -22,56 +22,59 @@ const LoginScreen = () => {
   const passwordInputRef = useRef<TextInput>(null);
 
   return (
-    <Screen
-      headerShown
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <AppText style={styles.title}>Welcome back to Splitwise!</AppText>
-      <AppForm
-        initialValues={{ email: "", password: "" }}
-        validationSchema={validationSchema}
-        onSubmit={(values) => console.log(values)}
+    <Screen headerShown style={{ backgroundColor: colors.background }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.container}
       >
-        <AppFormErrorMessage />
-        <View style={styles.form}>
-          <AppFormField
-            autoFocus
-            style={styles.inputGroup}
-            onSubmitEditing={() => passwordInputRef.current?.focus()}
-            blurOnSubmit={false}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            returnKeyType="next"
-            label="Email address"
-            name="email"
-          />
-          <AppFormField
-            ref={passwordInputRef}
-            textContentType="password"
-            autoComplete="password"
-            autoCorrect={false}
-            secureTextEntry={true}
-            style={styles.inputGroup}
-            name="password"
-          />
-        </View>
-        <View style={styles.btnContainer}>
-          <SubmitButton
-            ripple
-            title="Log in"
-            style={styles.loginBtn}
-            textStyle={styles.loginBtnText}
-          />
-          <AppButton
-            ripple
-            textStyle={[styles.forgotPassBtnTxt, { color: colors.secondary }]}
-            style={styles.forgotPassBtn}
-            title="Forgot your password?"
-          />
-        </View>
-      </AppForm>
+        <AppText style={styles.title}>Welcome back to Splitwise!</AppText>
+        <AppForm
+          initialValues={{ email: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log(values)}
+        >
+          <AppFormErrorMessage />
+          <View style={styles.form}>
+            <AppFormField
+              autoFocus
+              style={styles.inputGroup}
+              onSubmitEditing={() => passwordInputRef.current?.focus()}
+              blurOnSubmit={false}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              returnKeyType="next"
+              label="Email address"
+              name="email"
+            />
+            <AppFormField
+              ref={passwordInputRef}
+              textContentType="password"
+              autoComplete="password"
+              autoCorrect={false}
+              secureTextEntry={true}
+              style={styles.inputGroup}
+              label="Password"
+              name="password"
+            />
+          </View>
+          <View style={styles.btnContainer}>
+            <SubmitButton
+              ripple
+              title="Log in"
+              style={styles.loginBtn}
+              textStyle={styles.loginBtnText}
+            />
+            <AppButton
+              ripple
+              textStyle={[styles.forgotPassBtnTxt, { color: colors.secondary }]}
+              style={styles.forgotPassBtn}
+              title="Forgot your password?"
+            />
+          </View>
+        </AppForm>
+      </ScrollView>
     </Screen>
   );
 };
@@ -81,6 +84,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
+    flexGrow: 1,
   },
   title: {
     fontSize: 21,

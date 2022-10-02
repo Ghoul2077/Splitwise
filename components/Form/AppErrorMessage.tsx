@@ -7,14 +7,14 @@ import AppText from "../AppText";
 
 const AppErrorMessage = () => {
   const colors = useThemeColors();
-  const { errors, isSubmitting } = useFormikContext<FormikValues>();
+  const { errors, isSubmitting, isValid } = useFormikContext<FormikValues>();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0 && !isValid && !isSubmitting) {
       setVisible(true);
     }
-  }, [errors, isSubmitting]);
+  }, [errors, isSubmitting, isValid]);
 
   return (
     <AppModalDialog
@@ -37,7 +37,7 @@ export default AppErrorMessage;
 
 const styles = StyleSheet.create({
   errorMsg: {
-    fontSize: 18,
+    fontSize: 16,
     textTransform: "capitalize",
   },
 });

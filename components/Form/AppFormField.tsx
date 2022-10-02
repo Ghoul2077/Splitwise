@@ -36,9 +36,11 @@ const AppFormField = forwardRef<TextInput | null, AppFormFieldProps>(
 
     return (
       <View style={style}>
-        <Pressable onPress={() => inputRef.current?.focus()}>
-          <AppText style={[styles.label, labelStyle]}>{label ?? name}</AppText>
-        </Pressable>
+        {label && (
+          <Pressable onPress={() => inputRef.current?.focus()}>
+            <AppText style={[styles.label, labelStyle]}>{label}</AppText>
+          </Pressable>
+        )}
         <AppTextInput
           ref={inputRef}
           onChangeText={handleChange(name)}

@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../components/AppButton";
@@ -17,67 +17,73 @@ const OnboardingScreen: FC<OnboardingScreenProps> = ({ navigation }) => {
   const colors = useThemeColors();
 
   return (
-    <Screen style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.logoContainer}>
-        <Image
-          style={styles.logo}
-          source={require("../assets/images/appicon.png")}
-          resizeMode="cover"
-          resizeMethod="resize"
-        />
-        <AppText style={styles.appName}>Splitwise</AppText>
-      </View>
-      <View style={styles.actionContainer}>
-        <AppButton
-          ripple
-          style={[
-            styles.btn,
-            { backgroundColor: colors.primary, borderWidth: 0 },
-          ]}
-          textStyle={styles.btnText}
-          title="Sign up"
-        />
-        <AppButton
-          ripple
-          onPress={() => navigation.navigate(routes.LOGIN_SCREEN)}
-          style={[styles.btn, { borderColor: colors.grey }]}
-          textStyle={styles.btnText}
-          title="Log in"
-        />
-        <AppButton
-          ripple
-          style={[styles.btn, { borderColor: colors.grey }]}
-          textStyle={styles.btnText}
-          leftIcon={
-            <Ionicons
-              style={styles.google}
-              color={colors.white}
-              size={22}
-              name="logo-google"
-            />
-          }
-          title="Sign in with Google"
-        />
-      </View>
-      <View style={styles.tnc}>
-        <AppButton
-          textStyle={[styles.tncText, { color: colors.text_light }]}
-          style={styles.tncBtn}
-          title="Terms"
-        />
-        <AppText style={{ color: colors.text_light }}>|</AppText>
-        <AppButton
-          textStyle={[styles.tncText, { color: colors.text_light }]}
-          style={styles.tncBtn}
-          title="Privacy Policy"
-        />
-        <AppText style={{ color: colors.text_light }}>|</AppText>
-        <AppButton
-          textStyle={[styles.tncText, { color: colors.text_light }]}
-          style={styles.tncBtn}
-          title="Contact us"
-        />
-      </View>
+    <Screen style={{ backgroundColor: colors.background }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.container}
+      >
+        <View style={styles.logoContainer}>
+          <Image
+            style={styles.logo}
+            source={require("../assets/images/appicon.png")}
+            resizeMode="cover"
+            resizeMethod="resize"
+          />
+          <AppText style={styles.appName}>Splitwise</AppText>
+        </View>
+        <View style={styles.actionContainer}>
+          <AppButton
+            ripple
+            onPress={() => navigation.navigate(routes.SIGNUP_SCREEN)}
+            style={[
+              styles.btn,
+              { backgroundColor: colors.primary, borderWidth: 0 },
+            ]}
+            textStyle={styles.btnText}
+            title="Sign up"
+          />
+          <AppButton
+            ripple
+            onPress={() => navigation.navigate(routes.LOGIN_SCREEN)}
+            style={[styles.btn, { borderColor: colors.grey }]}
+            textStyle={styles.btnText}
+            title="Log in"
+          />
+          <AppButton
+            ripple
+            style={[styles.btn, { borderColor: colors.grey }]}
+            textStyle={styles.btnText}
+            leftIcon={
+              <Ionicons
+                style={styles.google}
+                color={colors.white}
+                size={22}
+                name="logo-google"
+              />
+            }
+            title="Sign in with Google"
+          />
+        </View>
+        <View style={styles.tnc}>
+          <AppButton
+            textStyle={[styles.tncText, { color: colors.text_light }]}
+            style={styles.tncBtn}
+            title="Terms"
+          />
+          <AppText style={{ color: colors.text_light }}>|</AppText>
+          <AppButton
+            textStyle={[styles.tncText, { color: colors.text_light }]}
+            style={styles.tncBtn}
+            title="Privacy Policy"
+          />
+          <AppText style={{ color: colors.text_light }}>|</AppText>
+          <AppButton
+            textStyle={[styles.tncText, { color: colors.text_light }]}
+            style={styles.tncBtn}
+            title="Contact us"
+          />
+        </View>
+      </ScrollView>
     </Screen>
   );
 };
@@ -86,8 +92,8 @@ export default OnboardingScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 20,
+    flexGrow: 1,
   },
   btn: {
     backgroundColor: "transparent",

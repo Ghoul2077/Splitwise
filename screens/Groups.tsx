@@ -45,6 +45,7 @@ const GroupsScreen: FC<GroupsScreenProps> = ({ navigation }) => {
     <Screen headerShown style={{ backgroundColor: colors.background }}>
       <FlatList
         data={[]}
+        renderItem={() => null}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
             <LottieView

@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     marginRight: -8,
   },
   okBtnTxt: {
-    fontSize: 12,
+    fontSize: 13,
   },
 });
 

@@ -16,7 +16,7 @@ import AppText from "./AppText";
 import useThemeColors from "../hooks/useThemeColors";
 
 export interface AppButtonProps extends Omit<TouchableOpacityProps, "onPress"> {
-  title?: string;
+  title?: string | React.ReactElement | React.ComponentType<any>;
   textStyle?: StyleProp<TextStyle>;
   leftIconName?: keyof typeof Ionicons.glyphMap;
   leftIcon?: ReactNode | JSX.Element;
@@ -38,7 +38,7 @@ export interface AppButtonProps extends Omit<TouchableOpacityProps, "onPress"> {
 const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
   (
     {
-      title,
+      title: Title,
       textStyle,
       leftIconName,
       leftIcon: LeftIcon,
@@ -120,7 +120,7 @@ const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
             />
           )}
           {!leftIconName && <>{LeftIcon}</>}
-          {title && (
+          {typeof Title === "string" && (
             <AppText
               style={[
                 styles.text,
@@ -137,10 +137,11 @@ const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
               ]}
               numberOfLines={numberOfLines}
             >
-              {title}
+              {Title}
             </AppText>
           )}
-
+          {React.isValidElement(Title) && Title}
+          {typeof Title === "function" && <Title />}
           {rightIconName && (
             <Ionicons
               name={rightIconName}

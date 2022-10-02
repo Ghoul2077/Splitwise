@@ -13,4 +13,5 @@ export type MainStackParamsList = {
   Tabs: NavigatorScreenParams<TabsParamsList>;
   [routes.ONBOARDING_SCREEN]: undefined;
   [routes.LOGIN_SCREEN]: undefined;
+  [routes.SIGNUP_SCREEN]: undefined;
 };
