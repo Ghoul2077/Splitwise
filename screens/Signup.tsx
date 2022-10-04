@@ -1,6 +1,14 @@
+import React, { useRef, FC, useState, memo } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useRef, FC } from "react";
-import { Image, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Yup from "yup";
 import AppButton from "../components/AppButton";
 import AppText from "../components/AppText";
@@ -15,6 +23,7 @@ import {
 import Screen from "../components/Screen";
 import useThemeColors from "../hooks/useThemeColors";
 import { MainStackParamsList } from "../navigation/types";
+import data from "../assets/images/flags/country_code";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email().required().label("Email"),
@@ -27,9 +36,49 @@ export type SignupScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamsList>;
 };
 
+export type CountryCodeOptionProps = {
+  countryName: string;
+  countryCode?: string;
+  countryPrefix: string;
+  countryFlag: ImageSourcePropType;
+};
+
+const CountryCodeOption: FC<CountryCodeOptionProps> = memo(
+  ({ countryName, countryFlag, countryPrefix }) => {
+    const colors = useThemeColors();
+
+    return (
+      <TouchableOpacity style={styles.countryItem}>
+        <View style={styles.countryFlagAndName}>
+          <Image
+            style={styles.countryFlag}
+            source={countryFlag}
+            resizeMode="cover"
+            resizeMethod="resize"
+          />
+          {!!countryName && (
+            <AppText numberOfLines={1} style={styles.countryName}>
+              {countryName}
+            </AppText>
+          )}
+        </View>
+        {!!countryPrefix && (
+          <AppText style={[styles.countryCode, { color: colors.text_light }]}>
+            +{countryPrefix}
+          </AppText>
+        )}
+      </TouchableOpacity>
+    );
+  }
+);
+
 const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
   const colors = useThemeColors();
+  const [countryCodes, setCountryCodes] = useState<typeof data>(data);
+
+  const emailRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
 
   return (
     <Screen style={{ backgroundColor: colors.background }}>
@@ -55,6 +104,8 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
           <AppFormField
             autoFocus
             style={styles.input}
+            onSubmitEditing={() => emailRef.current?.focus()}
+            blurOnSubmit={false}
             fontStyle={styles.inputTxt}
             placeholder="Full name"
             placeholderTextColor={colors.text_light}
@@ -72,6 +123,7 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
             />
             <View style={styles.dataInputWrapper}>
               <AppFormField
+                ref={emailRef}
                 fontStyle={styles.inputTxt}
                 onSubmitEditing={() => passwordInputRef.current?.focus()}
                 blurOnSubmit={false}
@@ -86,8 +138,11 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
               />
               <AppFormField
                 ref={passwordInputRef}
+                onSubmitEditing={() => phoneRef.current?.focus()}
+                blurOnSubmit={false}
                 textContentType="password"
                 autoComplete="password"
+                returnKeyType="next"
                 autoCorrect={false}
                 secureTextEntry={true}
                 style={styles.input}
@@ -101,13 +156,24 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
           <View style={styles.phoneInputContainer}>
             <AppFormPicker
               style={styles.inputPicker}
+              initialData={countryCodes}
               headerText="Choose a country"
               title={({ selection }) => (
-                <AppText style={styles.pickerTxt}>+91</AppText>
+                <AppText style={styles.pickerTxt}>
+                  +{selection?.dial_code}
+                </AppText>
               )}
-              renderItem={() => null}
+              renderItem={({ item }) => (
+                <CountryCodeOption
+                  countryPrefix={item.dial_code}
+                  countryFlag={item.flag}
+                  countryName={item.name}
+                />
+              )}
+              dataKeys={["name", "dial_code", "code"]}
             />
             <AppFormField
+              ref={phoneRef}
               textContentType="telephoneNumber"
               autoComplete="tel"
               autoCorrect={false}
@@ -125,6 +191,7 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
             <AppFormPicker
               style={styles.currencyBtn}
               headerText="Choose a currency"
+              initialData={[]}
               title={({ selection }) => (
                 <AppText
                   style={[
@@ -264,5 +331,28 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     textAlign: "center",
     fontWeight: "500",
+  },
+  countryItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+  },
+  countryCode: {
+    fontSize: 17,
+    fontWeight: "500",
+    marginLeft: "auto",
+  },
+  countryFlagAndName: {
+    flexGrow: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  countryFlag: {
+    width: 45,
+    height: 30,
+    marginRight: 25,
+  },
+  countryName: {
+    fontSize: 16,
   },
 });

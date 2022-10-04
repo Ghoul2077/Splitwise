@@ -54,6 +54,7 @@ export default function Navigator() {
     >
       <MainStackNavigator.Navigator
         screenOptions={{
+          headerShown: false,
           headerStyle: {
             backgroundColor: colors.background,
           },
@@ -63,16 +64,15 @@ export default function Navigator() {
         }}
       >
         <MainStackNavigator.Screen
-          options={{ headerShown: false }}
           name={routes.ONBOARDING_SCREEN}
           component={OnboardingScreen}
         />
         <MainStackNavigator.Screen
+          options={{ headerShown: true }}
           name={routes.LOGIN_SCREEN}
           component={LoginScreen}
         />
         <MainStackNavigator.Screen
-          options={{ headerShown: false }}
           name={routes.SIGNUP_SCREEN}
           component={SignupScreen}
         />

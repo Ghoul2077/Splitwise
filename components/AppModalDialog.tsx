@@ -135,7 +135,6 @@ const AppModalDialog: FC<AppModalDialogProps> = ({
                 <View>
                   {mode === "alert" && (
                     <AppButton
-                      ripple
                       title="OK"
                       onPress={handleClosing}
                       style={styles.okBtn}
@@ -195,8 +194,8 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     backgroundColor: "transparent",
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginRight: -8,
+    paddingHorizontal: 15,
+    marginRight: -13,
   },
   okBtnTxt: {
     fontSize: 13,

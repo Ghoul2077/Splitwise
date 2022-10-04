@@ -1,21 +1,20 @@
-import React, { FC, useRef, useState, useCallback } from "react";
-import { ListRenderItem, StatusBar, StyleProp, TextInput } from "react-native";
+import React, { FC, useRef, useState, useCallback, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Modal,
-  Dimensions,
   ViewStyle,
   FlatList,
+  ListRenderItem,
+  StyleProp,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { debounce } from "lodash";
+import Fuse from "fuse.js";
 import useThemeColors from "../../hooks/useThemeColors";
 import AppButton, { AppButtonProps } from "../AppButton";
 import AppTextInput from "../AppTextInput";
 import Screen from "../Screen";
 import AppText from "../AppText";
-
-const { width, height } = Dimensions.get("window");
 
 export interface AppModalPickerProps
   extends Omit<AppButtonProps, "onPress" | "style" | "title"> {
@@ -25,33 +24,69 @@ export interface AppModalPickerProps
   initialData?: any[];
   renderItem: ListRenderItem<any>;
   headerText?: string;
+  dataKeys?: Array<string>;
+  onSelectionChange?: Function;
 }
 
 const AppModalPicker: FC<AppModalPickerProps> = ({
   style,
-  initialData = [],
+  initialData,
   onSearch,
   renderItem,
   title: Title,
   headerText,
+  dataKeys,
+  onSelectionChange,
   ...others
 }) => {
   const colors = useThemeColors();
-  const inputRef = useRef<TextInput>(null);
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(initialData || []);
   const [query, setQuery] = useState("");
+
+  const fuse = useRef(
+    new Fuse(initialData || [], {
+      keys: dataKeys || [],
+      threshold: 0.4,
+    })
+  ).current;
 
   const reset = () => {
     setQuery("");
   };
 
+  const filter = useCallback(
+    debounce((query, initialData) => {
+      if (query) {
+        setData(fuse.search(query).map((elem) => elem.item));
+      } else {
+        setData(initialData || []);
+      }
+    }, 100),
+    []
+  );
+
+  useEffect(() => {
+    filter(query, initialData);
+  }, [query, initialData]);
+
+  useEffect(() => {
+    if (selected && onSelectionChange) {
+      onSelectionChange({ selected });
+    }
+  }, [selected]);
+
   const Header = useCallback(
     () => (
-      <View style={[styles.header, { borderColor: colors.grey }]}>
+      <View
+        style={[
+          styles.header,
+          { borderColor: colors.grey, backgroundColor: colors.background },
+        ]}
+      >
         <AppButton
           iconSize={24}
           style={styles.btn}
@@ -108,9 +143,11 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
       >
         <Screen style={{ backgroundColor: colors.background }}>
           <FlatList
+            data={data}
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.container}
+            stickyHeaderIndices={[0]}
             ListHeaderComponent={<Header />}
-            data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
             keyExtractor={(_i, index) => String(index)}
             renderItem={renderItem}
           />
