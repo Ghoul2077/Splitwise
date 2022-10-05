@@ -1,4 +1,11 @@
-import React, { FC, useRef, useState, useCallback, useEffect } from "react";
+import React, {
+  FC,
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  memo,
+} from "react";
 import {
   StyleSheet,
   View,
@@ -7,14 +14,18 @@ import {
   FlatList,
   ListRenderItem,
   StyleProp,
+  TouchableOpacity,
+  TextInput,
 } from "react-native";
 import { debounce } from "lodash";
 import Fuse from "fuse.js";
+import { Ionicons } from "@expo/vector-icons";
 import useThemeColors from "../../hooks/useThemeColors";
 import AppButton, { AppButtonProps } from "../AppButton";
 import AppTextInput from "../AppTextInput";
 import Screen from "../Screen";
 import AppText from "../AppText";
+import { FormikValues, useFormikContext } from "formik";
 
 export interface AppModalPickerProps
   extends Omit<AppButtonProps, "onPress" | "style" | "title"> {
@@ -26,13 +37,15 @@ export interface AppModalPickerProps
   headerText?: string;
   dataKeys?: Array<string>;
   onSelectionChange?: Function;
+  name: string;
 }
 
 const AppModalPicker: FC<AppModalPickerProps> = ({
   style,
   initialData,
+  name,
   onSearch,
-  renderItem,
+  renderItem: RenderItem,
   title: Title,
   headerText,
   dataKeys,
@@ -40,12 +53,14 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
   ...others
 }) => {
   const colors = useThemeColors();
+  const { setFieldValue, values } = useFormikContext<FormikValues>();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
-  const [selected, setSelected] = useState(null);
   const [data, setData] = useState(initialData || []);
   const [query, setQuery] = useState("");
+
+  const inputRef = useRef<TextInput>(null);
 
   const fuse = useRef(
     new Fuse(initialData || [], {
@@ -53,10 +68,6 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
       threshold: 0.4,
     })
   ).current;
-
-  const reset = () => {
-    setQuery("");
-  };
 
   const filter = useCallback(
     debounce((query, initialData) => {
@@ -73,12 +84,6 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
     filter(query, initialData);
   }, [query, initialData]);
 
-  useEffect(() => {
-    if (selected && onSelectionChange) {
-      onSelectionChange({ selected });
-    }
-  }, [selected]);
-
   const Header = useCallback(
     () => (
       <View
@@ -91,17 +96,34 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
           iconSize={24}
           style={styles.btn}
           leftIconName="ios-arrow-back"
-          onPress={() =>
-            searchVisible ? setSearchVisible(false) : setPopupVisible(false)
-          }
+          onPress={() => {
+            if (searchVisible) {
+              setSearchVisible(false);
+            } else {
+              setPopupVisible(false);
+            }
+            setQuery("");
+          }}
         />
         {searchVisible ? (
           <AppTextInput
             autoFocus
+            ref={inputRef}
             onChangeText={(text) => setQuery(text)}
             style={styles.input}
             placeholderTextColor={colors.text_light}
             placeholder="Search"
+            rightIcon={
+              <Ionicons
+                color={colors.text_light}
+                name="ios-close-outline"
+                size={30}
+              />
+            }
+            onPressIcon={() => {
+              inputRef?.current?.clear();
+              setQuery("");
+            }}
           />
         ) : (
           <AppText style={styles.heading}>{headerText ?? "Choose"}</AppText>
@@ -119,11 +141,25 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
     [searchVisible, colors, headerText]
   );
 
+  const PickerItem: ListRenderItem<any> = useCallback(
+    memo(({ item, index, separators }) => (
+      <TouchableOpacity
+        onPress={() => {
+          setFieldValue(name, item);
+          setPopupVisible(false);
+        }}
+      >
+        <RenderItem index={index} item={item} separators={separators} />
+      </TouchableOpacity>
+    )),
+    [RenderItem]
+  );
+
   return (
     <>
       <AppButton
         style={[styles.inputBtn, { borderColor: colors.white }, style]}
-        title={() => <Title selection={selected} />}
+        title={() => <Title selection={values[name]} />}
         onPress={() => setPopupVisible(true)}
         {...others}
       />
@@ -136,8 +172,8 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
             setSearchVisible(false);
           } else {
             setPopupVisible(false);
-            reset();
           }
+          setQuery("");
         }}
         animationType="slide"
       >
@@ -149,7 +185,7 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
             stickyHeaderIndices={[0]}
             ListHeaderComponent={<Header />}
             keyExtractor={(_i, index) => String(index)}
-            renderItem={renderItem}
+            renderItem={(props) => <PickerItem {...props} />}
           />
         </Screen>
       </Modal>

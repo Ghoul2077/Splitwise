@@ -1,12 +1,12 @@
 import React, { forwardRef, ReactNode, useState } from "react";
 import {
   GestureResponderEvent,
-  Pressable,
   StyleProp,
   StyleSheet,
   TextInput,
   TextInputProps,
   TextStyle,
+  TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
@@ -79,13 +79,13 @@ const AppTextInput = forwardRef<TextInput, AppTextInputPropsWithFocusedProps>(
           {...others}
           {...(isFocused ? otherFocusedProps : {})}
         />
-        <Pressable
+        <TouchableOpacity
           onPress={
             isFocused && !!focusedOnPressIcon ? focusedOnPressIcon : onPressIcon
           }
         >
           {isFocused && !!FocusedRightIcon ? FocusedRightIcon : RightIcon}
-        </Pressable>
+        </TouchableOpacity>
       </View>
     );
   }

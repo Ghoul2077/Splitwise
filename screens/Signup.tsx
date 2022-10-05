@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import * as Yup from "yup";
@@ -48,7 +47,7 @@ const CountryCodeOption: FC<CountryCodeOptionProps> = memo(
     const colors = useThemeColors();
 
     return (
-      <TouchableOpacity style={styles.countryItem}>
+      <View style={styles.countryItem}>
         <View style={styles.countryFlagAndName}>
           <Image
             style={styles.countryFlag}
@@ -67,7 +66,7 @@ const CountryCodeOption: FC<CountryCodeOptionProps> = memo(
             +{countryPrefix}
           </AppText>
         )}
-      </TouchableOpacity>
+      </View>
     );
   }
 );
@@ -155,13 +154,24 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
           </View>
           <View style={styles.phoneInputContainer}>
             <AppFormPicker
+              name="dialCode"
               style={styles.inputPicker}
               initialData={countryCodes}
               headerText="Choose a country"
               title={({ selection }) => (
-                <AppText style={styles.pickerTxt}>
-                  +{selection?.dial_code}
-                </AppText>
+                <View style={styles.countryCodeTitle}>
+                  {selection?.flag && (
+                    <Image
+                      style={styles.smallCountryFlag}
+                      source={selection.flag}
+                      resizeMode="cover"
+                      resizeMethod="resize"
+                    />
+                  )}
+                  <AppText style={styles.pickerTxt}>
+                    +{selection?.dial_code}
+                  </AppText>
+                </View>
               )}
               renderItem={({ item }) => (
                 <CountryCodeOption
@@ -189,6 +199,7 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
               I use INR (₹) as my currency.
             </AppText>
             <AppFormPicker
+              name="currency"
               style={styles.currencyBtn}
               headerText="Choose a currency"
               initialData={[]}
@@ -277,6 +288,7 @@ const styles = StyleSheet.create({
   },
   phoneInput: { flex: 1 },
   inputPicker: {
+    paddingHorizontal: 0,
     backgroundColor: "transparent",
     marginRight: 10,
   },
@@ -354,5 +366,16 @@ const styles = StyleSheet.create({
   },
   countryName: {
     fontSize: 16,
+  },
+  smallCountryFlag: {
+    width: 20,
+    height: 25,
+    marginRight: 10,
+  },
+  countryCodeTitle: {
+    minWidth: 20,
+    justifyContent: "space-around",
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
