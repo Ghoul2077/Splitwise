@@ -147,6 +147,8 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
         onPress={() => {
           setFieldValue(name, item);
           setPopupVisible(false);
+          setSearchVisible(false);
+          setQuery("");
         }}
       >
         <RenderItem index={index} item={item} separators={separators} />
