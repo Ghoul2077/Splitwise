@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import * as Yup from "yup";
+import "yup-phone";
 import AppButton from "../components/AppButton";
 import AppText from "../components/AppText";
 import {
@@ -22,18 +23,8 @@ import {
 import Screen from "../components/Screen";
 import useThemeColors from "../hooks/useThemeColors";
 import { MainStackParamsList } from "../navigation/types";
-import data from "../assets/images/flags/country_code";
-
-const validationSchema = Yup.object().shape({
-  email: Yup.string().email().required().label("Email"),
-  password: Yup.string().required().label("Password"),
-  name: Yup.string().required().label("name"),
-  phone: Yup.number().label("Phone"),
-});
-
-export type SignupScreenProps = {
-  navigation: NativeStackNavigationProp<MainStackParamsList>;
-};
+import countryCode from "../assets/images/flags/country_code";
+import countryCurrency from "../assets/data/country_currency";
 
 export type CountryCodeOptionProps = {
   countryName: string;
@@ -71,9 +62,55 @@ const CountryCodeOption: FC<CountryCodeOptionProps> = memo(
   }
 );
 
+export type CountryCurrencyOptionProps = {
+  countryName: string;
+  currencyCode: string;
+  currencyName: string;
+  currencySymbol: string;
+};
+
+const CountryCurrencyOption: FC<CountryCurrencyOptionProps> = memo(
+  ({ countryName, currencyCode, currencyName, currencySymbol }) => {
+    const colors = useThemeColors();
+
+    return (
+      <View style={styles.currencyItem}>
+        <AppText style={styles.currencyData}>
+          {countryName} {currencyName} ({currencySymbol})
+        </AppText>
+        <AppText style={[styles.currencyCode, { color: colors.text_light }]}>
+          {currencyCode}
+        </AppText>
+      </View>
+    );
+  }
+);
+
+const defaultValidationSchema = {
+  email: Yup.string().email().required().label("Email"),
+  password: Yup.string().required().label("Password"),
+  name: Yup.string().required().label("Name"),
+  phone: Yup.number().label("Phone").typeError("Not a valid phone number"),
+  currency: Yup.object().label("Currency").required(),
+  dialCode: Yup.object()
+    .label("Dial Code")
+    .when("phone", {
+      is: (val: any) => !!val,
+      then: Yup.object().required("Choose a dial code for you phone number"),
+    }),
+};
+
+export type SignupScreenProps = {
+  navigation: NativeStackNavigationProp<MainStackParamsList>;
+};
+
 const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
   const colors = useThemeColors();
-  const [countryCodes, setCountryCodes] = useState<typeof data>(data);
+  const [countryCodes] = useState<typeof countryCode>(countryCode);
+  const [countryCurrencies] = useState<typeof countryCurrency>(countryCurrency);
+  const [validationSchema, setValidationSchema] = useState<{
+    [key: string]: any;
+  }>(defaultValidationSchema);
 
   const emailRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
@@ -82,6 +119,7 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
   return (
     <Screen style={{ backgroundColor: colors.background }}>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
@@ -96,7 +134,7 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
         </View>
         <AppForm
           initialValues={{ email: "", password: "", profileImage: "" }}
-          validationSchema={validationSchema}
+          validationSchema={Yup.object().shape(validationSchema)}
           onSubmit={(values) => console.log(values)}
         >
           <AppFormErrorMessage />
@@ -156,6 +194,19 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
             <AppFormPicker
               name="dialCode"
               style={styles.inputPicker}
+              onSelectionChange={(newSelection: any) => {
+                setValidationSchema((prevSchema) => ({
+                  ...prevSchema,
+                  phone: Yup.string()
+                    .phone(
+                      newSelection.code,
+                      true,
+                      `Phone must be valid number from ${newSelection.name} region`
+                    )
+                    .label("Phone")
+                    .typeError("Not a valid phone number"),
+                }));
+              }}
               initialData={countryCodes}
               headerText="Choose a country"
               title={({ selection }) => (
@@ -195,26 +246,40 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
             />
           </View>
           <View style={styles.currencyContainer}>
-            <AppText style={styles.currencyText}>
-              I use INR (₹) as my currency.
-            </AppText>
             <AppFormPicker
               name="currency"
               style={styles.currencyBtn}
               headerText="Choose a currency"
-              initialData={[]}
+              initialData={countryCurrencies}
               title={({ selection }) => (
-                <AppText
-                  style={[
-                    styles.currencyText,
-                    styles.currencyBtnText,
-                    { color: colors.secondary },
-                  ]}
-                >
-                  Change ≫
-                </AppText>
+                <View style={styles.currencyTextContainer}>
+                  <AppText style={styles.currencyText}>
+                    I use{" "}
+                    {selection
+                      ? `${selection.name} (${selection.symbol})`
+                      : "___"}{" "}
+                    as my currency.
+                  </AppText>
+                  <AppText
+                    style={[
+                      styles.currencyText,
+                      styles.currencyBtnText,
+                      { color: colors.secondary },
+                    ]}
+                  >
+                    Change ≫
+                  </AppText>
+                </View>
               )}
-              renderItem={() => null}
+              renderItem={({ item }) => (
+                <CountryCurrencyOption
+                  countryName={item.country}
+                  currencyCode={item.code}
+                  currencyName={item.name}
+                  currencySymbol={item.symbol}
+                />
+              )}
+              dataKeys={["country", "code", "name", "symbol"]}
             />
           </View>
           <View style={styles.actionBtnContainer}>
@@ -284,7 +349,7 @@ const styles = StyleSheet.create({
   phoneInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   phoneInput: { flex: 1 },
   inputPicker: {
@@ -300,11 +365,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "center",
-    marginBottom: 40,
+    marginBottom: 30,
   },
   currencyBtn: {
+    paddingVertical: 10,
+    borderRadius: 5,
     borderBottomWidth: 0,
-    paddingVertical: 0,
     marginVertical: 0,
   },
   currencyText: {
@@ -312,6 +378,7 @@ const styles = StyleSheet.create({
   },
   currencyBtnText: {
     fontWeight: "900",
+    marginLeft: 5,
   },
   actionBtnContainer: {
     flexDirection: "row",
@@ -347,7 +414,8 @@ const styles = StyleSheet.create({
   countryItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 20,
   },
   countryCode: {
     fontSize: 17,
@@ -377,5 +445,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     flexDirection: "row",
     alignItems: "center",
+  },
+  currencyTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 275,
+  },
+  currencyItem: { paddingHorizontal: 15, paddingVertical: 10 },
+  currencyData: { fontSize: 17.5, marginBottom: 3 },
+  currencyCode: {
+    fontSize: 15,
+    textTransform: "uppercase",
   },
 });

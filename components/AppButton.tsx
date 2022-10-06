@@ -1,5 +1,6 @@
 import React, { forwardRef, Fragment, ReactNode } from "react";
 import {
+  Platform,
   Pressable,
   PressableAndroidRippleConfig,
   StyleProp,
@@ -61,7 +62,7 @@ const AppButton = forwardRef<TouchableOpacity, AppButtonProps>(
   ) => {
     const colors = useThemeColors();
     const TouchableComponent: typeof Pressable | typeof TouchableOpacity =
-      ripple ? Pressable : TouchableOpacity;
+      ripple && Platform.OS !== "ios" ? Pressable : TouchableOpacity;
     const isRippleOverflowAllowed =
       typeof ripple == "object" && ripple?.overflow;
     const WrapperComponent: typeof Fragment | typeof View =

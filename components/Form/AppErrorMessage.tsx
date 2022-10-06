@@ -38,6 +38,6 @@ export default AppErrorMessage;
 const styles = StyleSheet.create({
   errorMsg: {
     fontSize: 16,
-    textTransform: "capitalize",
+    textTransform: "none",
   },
 });

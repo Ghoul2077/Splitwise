@@ -81,6 +81,10 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
   );
 
   useEffect(() => {
+    if (values[name] && onSelectionChange) onSelectionChange(values[name]);
+  }, [values[name]]);
+
+  useEffect(() => {
     filter(query, initialData);
   }, [query, initialData]);
 
@@ -109,6 +113,7 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
           <AppTextInput
             autoFocus
             ref={inputRef}
+            returnKeyType="search"
             onChangeText={(text) => setQuery(text)}
             style={styles.input}
             placeholderTextColor={colors.text_light}
@@ -160,6 +165,7 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
   return (
     <>
       <AppButton
+        ripple
         style={[styles.inputBtn, { borderColor: colors.white }, style]}
         title={() => <Title selection={values[name]} />}
         onPress={() => setPopupVisible(true)}
@@ -182,10 +188,20 @@ const AppModalPicker: FC<AppModalPickerProps> = ({
         <Screen style={{ backgroundColor: colors.background }}>
           <FlatList
             data={data}
+            keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.container}
             stickyHeaderIndices={[0]}
             ListHeaderComponent={<Header />}
+            ListEmptyComponent={
+              initialData?.length ? (
+                <View style={styles.emptyContainer}>
+                  <AppText style={[styles.emptyTxt, { color: colors.error }]}>
+                    No results found
+                  </AppText>
+                </View>
+              ) : null
+            }
             keyExtractor={(_i, index) => String(index)}
             renderItem={(props) => <PickerItem {...props} />}
           />
@@ -230,6 +246,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingVertical: 3,
     borderRadius: 0,
+  },
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyTxt: {
+    fontSize: 16,
   },
 });
 
