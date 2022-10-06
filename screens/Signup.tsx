@@ -198,13 +198,18 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
                 setValidationSchema((prevSchema) => ({
                   ...prevSchema,
                   phone: Yup.string()
-                    .phone(
-                      newSelection.code,
-                      false,
-                      `Phone must be valid number from ${newSelection.name} region`
+                    .test(
+                      "test-phone",
+                      `Phone must be valid number from ${newSelection.name} region`,
+                      (value) => {
+                        if (value)
+                          return Yup.string()
+                            .phone(newSelection.code, true)
+                            .isValidSync(value);
+                        return true;
+                      }
                     )
-                    .label("Phone")
-                    .notRequired(),
+                    .label("Phone"),
                 }));
               }}
               initialData={countryCodes}
