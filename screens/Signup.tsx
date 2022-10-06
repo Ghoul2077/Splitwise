@@ -200,11 +200,11 @@ const SignupScreen: FC<SignupScreenProps> = ({ navigation }) => {
                   phone: Yup.string()
                     .phone(
                       newSelection.code,
-                      true,
+                      false,
                       `Phone must be valid number from ${newSelection.name} region`
                     )
                     .label("Phone")
-                    .typeError("Not a valid phone number"),
+                    .notRequired(),
                 }));
               }}
               initialData={countryCodes}
