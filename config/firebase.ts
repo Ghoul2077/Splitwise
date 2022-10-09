@@ -22,7 +22,7 @@ const firebaseConfig = {
   appId: FIREBASE_APP_ID,
 };
 
-let app;
+let app: FirebaseApp | undefined;
 
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -33,3 +33,4 @@ export const auth = initializeAuth(app as FirebaseApp, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 export const storage = getStorage(app);
+export default app as FirebaseApp;

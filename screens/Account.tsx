@@ -11,6 +11,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuthState } from "react-firebase-hooks/auth";
 import Screen from "../components/Screen";
 import { useAppDispatch, useAppSelector } from "../store/hook";
 import { MainStackParamsList, TabsParamsList } from "../navigation/types";
@@ -18,6 +19,8 @@ import useThemeColors from "../hooks/useThemeColors";
 import routes from "../navigation/routes";
 import AppText from "../components/AppText";
 import AppButton from "../components/AppButton";
+import useFirebaseAuth from "../hooks/useFirebaseAuth";
+import { auth } from "../config/firebase";
 
 export interface AccountScreenProps {
   navigation: CompositeNavigationProp<
@@ -29,7 +32,8 @@ export interface AccountScreenProps {
 const AccountScreen: FC<AccountScreenProps> = ({ navigation }) => {
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((state) => state.theme);
+  const { logoutHandler } = useFirebaseAuth();
+  const [user, firebaseLoading, firebaseError] = useAuthState(auth);
   const scrollPosition = useRef(new Animated.Value(0)).current;
   const [headerSize, setHeaderSize] = useState(0);
 
@@ -95,7 +99,11 @@ const AccountScreen: FC<AccountScreenProps> = ({ navigation }) => {
             <TouchableOpacity style={styles.imageUpload}>
               <Image
                 style={styles.image}
-                source={require("../assets/images/placeholder.png")}
+                source={
+                  user?.photoURL
+                    ? { uri: user?.photoURL }
+                    : require("../assets/images/placeholder.png")
+                }
                 resizeMode="cover"
                 resizeMethod="resize"
               />
@@ -107,9 +115,9 @@ const AccountScreen: FC<AccountScreenProps> = ({ navigation }) => {
               />
             </TouchableOpacity>
             <View>
-              <AppText style={styles.username}>Jhon Doe</AppText>
+              <AppText style={styles.username}>{user?.displayName}</AppText>
               <AppText style={[styles.email, { color: colors.text_light }]}>
-                jhondoe@gmail.com
+                {user?.email}
               </AppText>
             </View>
           </View>
@@ -211,6 +219,7 @@ const AccountScreen: FC<AccountScreenProps> = ({ navigation }) => {
           style={styles.option}
           iconColor={colors.secondary}
           textStyle={[styles.optionTxt, { color: colors.secondary }]}
+          onPress={logoutHandler}
           leftIconName="ios-log-out-outline"
           title="Logout"
         />
@@ -252,7 +261,8 @@ const styles = StyleSheet.create({
     fontSize: 27,
   },
   accountInfo: {
-    paddingHorizontal: 20,
+    height: 120,
+    paddingHorizontal: 15,
     paddingVertical: 25,
     flexDirection: "row",
     alignItems: "center",
@@ -322,6 +332,8 @@ const styles = StyleSheet.create({
   },
   details: { flexDirection: "row", alignItems: "center" },
   imageUpload: {
+    alignItems: "center",
+    justifyContent: "center",
     position: "relative",
     marginRight: 25,
   },

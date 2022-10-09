@@ -8,6 +8,7 @@ import useThemeColors from "../hooks/useThemeColors";
 import AppText from "../components/AppText";
 import { MainStackParamsList } from "../navigation/types";
 import routes from "../navigation/routes";
+import useFirebaseAuth from "../hooks/useFirebaseAuth";
 
 export type OnboardingScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamsList>;
@@ -15,6 +16,7 @@ export type OnboardingScreenProps = {
 
 const OnboardingScreen: FC<OnboardingScreenProps> = ({ navigation }) => {
   const colors = useThemeColors();
+  const { loginWithGoogle } = useFirebaseAuth();
 
   return (
     <Screen style={{ backgroundColor: colors.background }}>
@@ -51,6 +53,7 @@ const OnboardingScreen: FC<OnboardingScreenProps> = ({ navigation }) => {
           />
           <AppButton
             ripple
+            onPress={loginWithGoogle}
             style={[styles.btn, { borderColor: colors.grey }]}
             textStyle={styles.btnText}
             leftIcon={

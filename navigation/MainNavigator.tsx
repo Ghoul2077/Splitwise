@@ -25,7 +25,11 @@ enableScreens();
 
 const MainStackNavigator = createNativeStackNavigator<MainStackParamsList>();
 
-export default function Navigator() {
+export default function Navigator({
+  isLoggedin = false,
+}: {
+  isLoggedin: boolean;
+}) {
   const dispatch = useAppDispatch();
 
   const colors = useThemeColors();
@@ -63,20 +67,26 @@ export default function Navigator() {
           headerTintColor: colors.white,
         }}
       >
-        <MainStackNavigator.Screen
-          name={routes.ONBOARDING_SCREEN}
-          component={OnboardingScreen}
-        />
-        <MainStackNavigator.Screen
-          options={{ headerShown: true }}
-          name={routes.LOGIN_SCREEN}
-          component={LoginScreen}
-        />
-        <MainStackNavigator.Screen
-          name={routes.SIGNUP_SCREEN}
-          component={SignupScreen}
-        />
-        <MainStackNavigator.Screen name="Tabs" component={TabStack} />
+        {!isLoggedin && (
+          <>
+            <MainStackNavigator.Screen
+              name={routes.ONBOARDING_SCREEN}
+              component={OnboardingScreen}
+            />
+            <MainStackNavigator.Screen
+              options={{ headerShown: true }}
+              name={routes.LOGIN_SCREEN}
+              component={LoginScreen}
+            />
+            <MainStackNavigator.Screen
+              name={routes.SIGNUP_SCREEN}
+              component={SignupScreen}
+            />
+          </>
+        )}
+        {isLoggedin && (
+          <MainStackNavigator.Screen name="Tabs" component={TabStack} />
+        )}
       </MainStackNavigator.Navigator>
     </NavigationContainer>
   );

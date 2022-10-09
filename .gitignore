@@ -1,3 +1,4 @@
+google-services.json
 node_modules/
 .expo/
 dist/
@@ -7,6 +8,7 @@ npm-debug.*
 *.p8
 *.p12
 *.key
+*.plist
 *.mobileprovision
 *.orig.*
 web-build/

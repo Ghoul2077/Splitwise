@@ -17,15 +17,15 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import Fuse from "fuse.js";
 import { Ionicons } from "@expo/vector-icons";
+import { FormikValues, useFormikContext } from "formik";
 import useThemeColors from "../../hooks/useThemeColors";
 import AppButton, { AppButtonProps } from "../AppButton";
 import AppTextInput from "../AppTextInput";
 import Screen from "../Screen";
 import AppText from "../AppText";
-import { FormikValues, useFormikContext } from "formik";
 
 export interface AppModalPickerProps
   extends Omit<AppButtonProps, "onPress" | "style" | "title"> {

@@ -1,33 +1,39 @@
 {
   "expo": {
-    "name": "splitwise-clone",
-    "slug": "splitwise-clone",
+    "name": "Splitwise",
+    "slug": "splitwise",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "splitwise",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.splitwise.clone"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "googleServicesFile": "./google-services.json",
+      "package": "com.splitwise.clone"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": ["@react-native-google-signin/google-signin"],
+    "extra": {
+      "eas": {
+        "projectId": "e7a6018c-19da-4d74-bb0f-171c47cd6e8a"
+      }
     }
   }
 }
